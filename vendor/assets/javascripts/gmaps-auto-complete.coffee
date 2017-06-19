@@ -18,6 +18,8 @@ class GmapsCompleter
   pos: [0, 0]
   inputField: '#gmaps-input-address'
   placeIdField: '#gmaps-input-place-id'
+  cityField: '#gmaps-input-city'
+  stateField: '#gmaps-input-state'
   errorField: '#gmaps-error'
 
   constructor: (opts) ->
@@ -45,6 +47,7 @@ class GmapsCompleter
     opts  = $.extend true, {}, @defaultOptions, opts
 
     @positionOutputter  = opts['positionOutputter'] || @assist.positionOutputter
+    @getAddressSpecificComponent = @assist.getAddressSpecificComponent
     @updateUI           = opts['updateUI'] || @assist.updateUI
     @updateMap          = opts['updateMap'] || @assist.updateMap
 
@@ -158,7 +161,7 @@ class GmapsCompleter
     # Google geocoding has succeeded!
     if results[0]
       # Always update the UI elements with new location data
-      @updateUI results[0].formatted_address, results[0].geometry.location, results[0].place_id
+      # @updateUI results[0].formatted_address, results[0].geometry.location, results[0].place_id
 
       # Only update the map (position marker and center map) if requested
       @updateMap(results[0].geometry) if @update
@@ -204,7 +207,7 @@ class GmapsCompleter
     defaultAutocompleteOpts =
       # event triggered when drop-down option selected
       select: (event,ui) ->
-        self.updateUI  ui.item.value, ui.item.geocode.geometry.location, ui.item.geocode.place_id
+        self.updateUI  ui.item
         self.updateMap ui.item.geocode.geometry
       # source is the list of input options shown in the autocomplete dropdown.
       # see documentation: http://jqueryui.com/demos/autocomplete/
@@ -263,6 +266,8 @@ class GmapsCompleterDefaultAssist
     pos: [0, 0]
     inputField: '#gmaps-input-address'
     placeIdField: '#gmaps-input-place-id'
+    cityField: '#gmaps-input-city'
+    stateField: '#gmaps-input-state'
     errorField: '#gmaps-error'
     debugOn: true
 
@@ -275,23 +280,34 @@ class GmapsCompleterDefaultAssist
     marker.setPosition(geometry.location) if marker
 
   # fill in the UI elements with new position data
-  updateUI: (address, latLng, placeId) ->
+  updateUI: (position_data) ->
     inputField = @inputField
     placeIdField = @placeIdField
+    stateField = @stateField
+    cityField = @cityField
     country = @country
 
     $(inputField).autocomplete 'close'
 
     @debug 'country', country
 
-    updateAdr = address.replace ', ' + country, ''
-    updateAdr = address
+    updateAdr = position_data.value.replace ', ' + country, ''
+    updateAdr = position_data.value
+    city = @getAddressSpecificComponent(position_data.geocode.address_components, 'locality')
+    state = @getAddressSpecificComponent(position_data.geocode.address_components, 'administrative_area_level_1')
 
     @debug 'updateAdr', updateAdr
 
     $(inputField).val updateAdr
-    $(placeIdField).val placeId
-    @positionOutputter latLng
+    $(placeIdField).val position_data.geocode.place_id
+    $(stateField).val state
+    $(cityField).val city
+    @positionOutputter position_data.geocode.geometry.location
+
+  getAddressSpecificComponent: (addressComponents, component) ->
+    for addressComponent in addressComponents
+      return addressComponent.short_name if component in addressComponent.types
+
 
   positionOutputter: (latLng) ->
     $('#gmaps-output-latitude').html latLng.lat()
