@@ -304,7 +304,7 @@ class GmapsCompleterDefaultAssist
     updateAdr = position_data.value
     route = @getAddressSpecificComponent(position_data.geocode.address_components, 'route')
     city = @getAddressSpecificComponent(position_data.geocode.address_components, 'locality')
-    postalCode = @getAddressSpecificComponent(position_data.geocode.address_components, 'postal-code')
+    postalCode = @getAddressSpecificComponent(position_data.geocode.address_components, 'postal_code')
     state = @getAddressSpecificComponent(position_data.geocode.address_components, 'administrative_area_level_1')
     country_code = @getAddressSpecificComponent(position_data.geocode.address_components, 'country')
 
