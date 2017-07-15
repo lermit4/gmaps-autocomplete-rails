@@ -325,8 +325,8 @@ class GmapsCompleterDefaultAssist
 
 
   positionOutputter: (latLng) ->
-    $('#gmaps-output-latitude').html latLng.lat()
-    $('#gmaps-output-longitude').html latLng.lng()
+    $('#gmaps-input-latitude').val latLng.lat()
+    $('#gmaps-input-longitude').val latLng.lng()
 
   geocodeErrorMsg: ->
     "Sorry, something went wrong. Try again!"
