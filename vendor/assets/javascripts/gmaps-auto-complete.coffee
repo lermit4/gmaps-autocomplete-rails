@@ -18,10 +18,13 @@ class GmapsCompleter
   pos: [0, 0]
   inputField: '#gmaps-input-address'
   placeIdField: '#gmaps-input-place-id'
+  routeField: '#gmaps-input-route'
   cityField: '#gmaps-input-city'
+  postalCodeField: '#gmaps-input-postal-code'
   stateField: '#gmaps-input-state'
+  countryCodeField: '#gmaps-input-coutry'
   errorField: '#gmaps-error'
-
+  
   constructor: (opts) ->
     @init opts
 
