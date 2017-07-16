@@ -117,6 +117,8 @@ class GmapsCompleter
     )
 
     self.addMapListeners @marker, @map
+    marker  = @marker
+    marker.setPosition(latlng) if marker
 
   debug: (label, obj) ->
     return if not @debugOn
@@ -164,7 +166,7 @@ class GmapsCompleter
     # Google geocoding has succeeded!
     if results[0]
       # Always update the UI elements with new location data
-      # @updateUI results[0].formatted_address, results[0].geometry.location, results[0].place_id
+      # @updateUI results[0]
 
       # Only update the map (position marker and center map) if requested
       @updateMap(results[0].geometry) if @update
@@ -210,7 +212,7 @@ class GmapsCompleter
     defaultAutocompleteOpts =
       # event triggered when drop-down option selected
       select: (event,ui) ->
-        self.updateUI  ui.item
+        self.updateUI  ui.item.geocode
         self.updateMap ui.item.geocode.geometry
       # source is the list of input options shown in the autocomplete dropdown.
       # see documentation: http://jqueryui.com/demos/autocomplete/
@@ -302,22 +304,22 @@ class GmapsCompleterDefaultAssist
 
     updateAdr = position_data.value.replace ', ' + country, ''
     updateAdr = position_data.value
-    route = @getAddressSpecificComponent(position_data.geocode.address_components, 'route')
-    city = @getAddressSpecificComponent(position_data.geocode.address_components, 'locality')
-    postalCode = @getAddressSpecificComponent(position_data.geocode.address_components, 'postal_code')
-    state = @getAddressSpecificComponent(position_data.geocode.address_components, 'administrative_area_level_1')
-    country_code = @getAddressSpecificComponent(position_data.geocode.address_components, 'country')
+    route = @getAddressSpecificComponent(position_data.address_components, 'route')
+    city = @getAddressSpecificComponent(position_data.address_components, 'locality')
+    postalCode = @getAddressSpecificComponent(position_data.address_components, 'postal_code')
+    state = @getAddressSpecificComponent(position_data.address_components, 'administrative_area_level_1')
+    country_code = @getAddressSpecificComponent(position_data.address_components, 'country')
 
     @debug 'updateAdr', updateAdr
 
     $(inputField).val updateAdr
-    $(placeIdField).val position_data.geocode.place_id
+    $(placeIdField).val position_data.place_id
     $(routeField).val route
     $(stateField).val state
     $(cityField).val city
     $(postalCodeField).val postalCode
     $(countryCodeField).val country_code
-    @positionOutputter position_data.geocode.geometry.location
+    @positionOutputter position_data.geometry.location
 
   getAddressSpecificComponent: (addressComponents, component) ->
     for addressComponent in addressComponents
