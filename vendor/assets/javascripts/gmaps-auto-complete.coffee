@@ -166,7 +166,7 @@ class GmapsCompleter
     # Google geocoding has succeeded!
     if results[0]
       # Always update the UI elements with new location data
-      # @updateUI results[0]
+      @updateUI results[0]
 
       # Only update the map (position marker and center map) if requested
       @updateMap(results[0].geometry) if @update
@@ -226,7 +226,9 @@ class GmapsCompleter
 
         self.debug 'geocode address', address
 
-        geocodeOpts = { address: address, componentRestrictions: { country: region || '' } }
+        geocodeOpts = address: address
+        if typeof region !='undefined' && region !=''
+          geocodeOpts.componentRestrictions = country: region  
 
         # the geocode method takes an address or LatLng to search for
         # and a callback function which should process the results into
@@ -302,8 +304,7 @@ class GmapsCompleterDefaultAssist
     
     @debug 'country', country
 
-    updateAdr = position_data.value.replace ', ' + country, ''
-    updateAdr = position_data.value
+    updateAdr = position_data.formatted_address
     route = @getAddressSpecificComponent(position_data.address_components, 'route')
     city = @getAddressSpecificComponent(position_data.address_components, 'locality')
     postalCode = @getAddressSpecificComponent(position_data.address_components, 'postal_code')
