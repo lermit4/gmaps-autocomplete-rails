@@ -75,6 +75,8 @@ class GmapsCompleter
     @inputField = opts['inputField']
     @errorField = opts['#gmaps-error']
     @debugOn    = opts['debugOn']
+    @youPlaces =window[@inputField.substr(1) + '_data']
+    console.log(@youPlaces)
 
     @debug 'called with opts',  callOpts
     @debug 'final completerAssist', @completerAssist
@@ -230,22 +232,46 @@ class GmapsCompleter
         if typeof region !='undefined' && region !=''
           geocodeOpts.componentRestrictions = country: region  
 
+        resultFromSource1 = null
+        resultFromSource2 = null
+
+        agregateResults = ->
+          if resultFromSource1 and resultFromSource2
+            result = resultFromSource1.concat(resultFromSource2)
+            response result
+          else
+            null
+
+        mapItems = (results) ->
+          $.map(results, (item) ->
+            uiAddress = item.formatted_address.replace ", " + self.country, ''
+            # var uiAddress = item.formatted_address;
+            {
+            label: uiAddress # appears in dropdown box
+            value: uiAddress # inserted into input element when selected
+            geocode: item    # all geocode data: used in select callback event
+            }
+          )
+
+
         # the geocode method takes an address or LatLng to search for
         # and a callback function which should process the results into
         # a format accepted by jqueryUI autocomplete
         self.geocoder.geocode(geocodeOpts, (results, status) ->
-          response(
-            $.map(results, (item) ->
-              uiAddress = item.formatted_address.replace ", " + self.country, ''
-              # var uiAddress = item.formatted_address;
-              {
-              label: uiAddress # appears in dropdown box
-              value: uiAddress # inserted into input element when selected
-              geocode: item    # all geocode data: used in select callback event
-              }
-            )
-          )
+          console.log(results)
+          resultFromSource2 = mapItems(results)
+          agregateResults()
         )
+
+        matcher = new RegExp($.ui.autocomplete.escapeRegex(request.term), 'i')
+        console.log(self.youPlaces)
+        placeFind = $.grep(self.youPlaces, (item) ->
+          matcher.test(item.formatted_address) or matcher.test(item.formatted_address.normalize())
+        )
+        resultFromSource1 = mapItems(placeFind)
+        agregateResults()
+        console.log(placeFind)
+
 
     autocompleteOpts = $.extend true, defaultAutocompleteOpts, autocompleteOpts
 
