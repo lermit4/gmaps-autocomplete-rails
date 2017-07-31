@@ -75,8 +75,8 @@ class GmapsCompleter
     @inputField = opts['inputField']
     @errorField = opts['#gmaps-error']
     @debugOn    = opts['debugOn']
-    @youPlaces =window[@inputField.substr(1) + '_data']
-    console.log(@youPlaces)
+    @yourPlaces =window[@inputField.substr(1) + '_data']
+    console.log(@yourPlaces)
 
     @debug 'called with opts',  callOpts
     @debug 'final completerAssist', @completerAssist
@@ -262,16 +262,16 @@ class GmapsCompleter
           resultFromSource2 = mapItems(results)
           agregateResults()
         )
-
-        matcher = new RegExp($.ui.autocomplete.escapeRegex(request.term), 'i')
-        console.log(self.youPlaces)
-        placeFind = $.grep(self.youPlaces, (item) ->
-          matcher.test(item.formatted_address) or matcher.test(item.formatted_address.normalize())
-        )
-        resultFromSource1 = mapItems(placeFind)
-        agregateResults()
-        console.log(placeFind)
-
+        if self.yourPlaces
+          matcher = new RegExp($.ui.autocomplete.escapeRegex(request.term), 'i')
+          console.log(self.yourPlaces)
+          placeFind = $.grep(self.yourPlaces, (item) ->
+            matcher.test(item.formatted_address) or matcher.test(item.formatted_address.normalize())
+          )
+          resultFromSource1 = mapItems(placeFind)
+          agregateResults()
+        else
+          resultFromSource1 = []
 
     autocompleteOpts = $.extend true, defaultAutocompleteOpts, autocompleteOpts
 
