@@ -24,6 +24,7 @@ class GmapsCompleter
   stateField: '#gmaps-input-state'
   countryCodeField: '#gmaps-input-coutry'
   errorField: '#gmaps-error'
+  idField: '#gmaps-input-id'
   
   constructor: (opts) ->
     @init opts
@@ -305,6 +306,7 @@ class GmapsCompleterDefaultAssist
     stateField: '#gmaps-input-state'
     countryField: '#gmaps-input-country'
     errorField: '#gmaps-error'
+    idField: '#gmaps-input-id'
     debugOn: true
 
   # move the marker to a new position, and center the map on it
@@ -325,11 +327,13 @@ class GmapsCompleterDefaultAssist
     postalCodeField = @postalCodeField
     countryCodeField = @countryCodeField
     country = @country
+    idField = @idField
 
     $(inputField).autocomplete 'close'
     
     @debug 'country', country
-
+    @debug 'position_data', position_data
+    
     updateAdr = position_data.formatted_address
     route = @getAddressSpecificComponent(position_data.address_components, 'route')
     city = @getAddressSpecificComponent(position_data.address_components, 'locality')
@@ -346,6 +350,7 @@ class GmapsCompleterDefaultAssist
     $(cityField).val city
     $(postalCodeField).val postalCode
     $(countryCodeField).val country_code
+    $(idField).val position_data.id
     @positionOutputter position_data.geometry.location
 
   getAddressSpecificComponent: (addressComponents, component) ->
